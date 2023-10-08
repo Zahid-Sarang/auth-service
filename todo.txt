@@ -1,0 +1,1 @@
+docker run --rm -it -v "/Users/shadabsarang/Downloads/Web-Development/Mastering_Mern/auth-service:/usr/src/app" -v "/usr/src/app/node_modules" --env-file "/Users/shadabsarang/Downloads/Web-Development/Mastering_Mern/auth-service/.env.dev" -p 8000:8000 -e NODE_ENV=development auth-service:dev
