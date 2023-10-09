@@ -12,7 +12,7 @@ export class UserService {
             where: { email: email },
         });
         if (user) {
-            const error = createHttpError(400, "email is already in exists!");
+            const error = createHttpError(400, "Email is already in exists!");
             throw error;
         }
         // Hash the password
