@@ -2,8 +2,8 @@ import request from "supertest";
 import { DataSource } from "typeorm";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/data-source";
+import { Roles } from "../../src/constants";
 import { User } from "../../src/entity/User";
-import { truncateTable } from "../utils";
 
 describe("POST /auth/register", () => {
     let connection: DataSource;
@@ -14,7 +14,8 @@ describe("POST /auth/register", () => {
 
     beforeEach(async () => {
         // DataBase truncate
-        await truncateTable(connection);
+        await connection.dropDatabase();
+        await connection.synchronize();
     });
 
     afterAll(async () => {
@@ -81,7 +82,8 @@ describe("POST /auth/register", () => {
             expect(users[0].email).toBe("zahid@gmail.com");
             expect(users[0].password).toBe("secret");
         });
-        it("should retrun an id of the user", async () => {
+
+        it("should retrun an id of the created user", async () => {
             // Arrange
             const userData = {
                 firstName: "John",
@@ -96,10 +98,28 @@ describe("POST /auth/register", () => {
                 .send(userData);
 
             // Assert
-            // Assert
             expect(response.statusCode).toBe(201);
             // expect(response.body).toEqual({ id: expect.any(Number) });
             expect(response.body).toHaveProperty("id");
+        });
+
+        it("should asign the a customer role", async () => {
+            // Arrange
+            const userData = {
+                firstName: "John",
+                lastName: "Smith",
+                email: "zahid@gmail.com",
+                password: "secret",
+            };
+
+            // Act
+            await request(app).post("/auth/register").send(userData);
+
+            //Assert
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users[0]).toHaveProperty("role");
+            expect(users[0].role).toBe(Roles.CUSTOMER);
         });
     });
     describe("Fields are missing", () => {});
