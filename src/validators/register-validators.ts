@@ -10,5 +10,13 @@ export default checkSchema({
         errorMessage: "Password is required!",
         notEmpty: true,
     },
+    firstName: {
+        errorMessage: "First Name is required!",
+        notEmpty: true,
+    },
+    lastName: {
+        errorMessage: "First Name is required!",
+        notEmpty: true,
+    },
 });
 // export default [body("email").notEmpty().withMessage("Email is required")];

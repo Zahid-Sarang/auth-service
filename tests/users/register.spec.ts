@@ -167,12 +167,12 @@ describe("POST /auth/register", () => {
     });
 
     describe("Fields are missing", () => {
-        it("should return 400 status code if email field is missing", async () => {
+        it("should return 400 status code if any fields is missing", async () => {
             // Arrange
             const userData = {
-                firstName: "John",
-                lastName: "Smith",
-                email: "",
+                firstName: "zahid",
+                lastName: "",
+                email: "zahid@gmail.com",
                 password: "secret",
             };
 
@@ -195,7 +195,7 @@ describe("POST /auth/register", () => {
             const userData = {
                 firstName: "John",
                 lastName: "Smith",
-                email: " zahid@example.com ",
+                email: " zahid@gmail.com ",
                 password: "secret",
             };
 
@@ -206,7 +206,7 @@ describe("POST /auth/register", () => {
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
             const user = users[0];
-            expect(user.email).toBe("zahid@example.com");
+            expect(user.email).toBe("zahid@gmail.com");
         });
     });
 });
