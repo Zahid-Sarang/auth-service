@@ -8,9 +8,7 @@ export class AuthController {
     constructor(
         private userService: UserService,
         private logger: Logger,
-    ) {
-        this.userService = userService;
-    }
+    ) {}
     async register(
         req: RegisterUserRequest,
         res: Response,
@@ -23,9 +21,9 @@ export class AuthController {
         }
         const { firstName, lastName, email, password } = req.body;
         this.logger.debug("New request to register a user:", {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
+            firstName,
+            lastName,
+            email,
             password: "******",
         });
         try {
