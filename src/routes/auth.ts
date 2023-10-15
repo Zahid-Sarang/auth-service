@@ -5,11 +5,13 @@ import { UserService } from "../service/UserService";
 import { User } from "../entity/User";
 import logger from "../config/logger";
 import registerValidators from "../validators/register-validators";
+import { TokenService } from "../service/TokenService";
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService(userRepository);
-const authController = new AuthController(userService, logger);
+const tokenService = new TokenService();
+const authController = new AuthController(userService, logger, tokenService);
 
 router.post(
     "/register",
