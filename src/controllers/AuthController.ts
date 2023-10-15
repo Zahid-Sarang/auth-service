@@ -5,8 +5,6 @@ import { UserService } from "../service/UserService";
 import { TokenService } from "../service/TokenService";
 import { RegisterUserRequest } from "../types";
 import { validationResult } from "express-validator";
-import { AppDataSource } from "../config/data-source";
-import { RefreshToken } from "../entity/RefreshToken";
 
 export class AuthController {
     constructor(
@@ -31,7 +29,8 @@ export class AuthController {
             email,
             password: "******",
         });
-        // user-service
+
+        // persist user information
         try {
             const user = await this.userService.create({
                 firstName,
@@ -50,20 +49,15 @@ export class AuthController {
             const accessToken = this.tokenService.generateAccessToken(payload);
 
             // Persist the refresh token
-            const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365;
-            const refreshTokenRepository =
-                AppDataSource.getRepository(RefreshToken);
-            const newRefreshToken = await refreshTokenRepository.save({
-                user: user,
-                expiresAt: new Date(Date.now() + MS_IN_YEAR),
-            });
+            const newRefreshToken =
+                await this.tokenService.persistRefreshToken(user);
 
+            // generate refresh token
             const refreshToken = this.tokenService.generateRefreshToken({
                 ...payload,
                 id: String(newRefreshToken.id),
             });
 
-            // send httpOnly cookies
             res.cookie("accessToken", accessToken, {
                 domain: "localhost",
                 sameSite: "strict",
