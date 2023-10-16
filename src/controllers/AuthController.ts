@@ -5,13 +5,17 @@ import { UserService } from "../service/UserService";
 import { TokenService } from "../service/TokenService";
 import { RegisterUserRequest } from "../types";
 import { validationResult } from "express-validator";
+import createHttpError from "http-errors";
+import { CredentialService } from "../service/CredentialService";
 
 export class AuthController {
     constructor(
         private userService: UserService,
         private logger: Logger,
         private tokenService: TokenService,
+        private credentialsService: CredentialService,
     ) {}
+    // Register Method
     async register(
         req: RegisterUserRequest,
         res: Response,
@@ -77,5 +81,56 @@ export class AuthController {
             next(err);
             return;
         }
+    }
+
+    // Login Method
+
+    async login(req: RegisterUserRequest, res: Response, next: NextFunction) {
+        // Validation
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ errors: result.array() });
+        }
+
+        const { email, password } = req.body;
+        this.logger.debug("New request to register a user:", {
+            email,
+            password: "******",
+        });
+
+        // check if email is existing in database
+        try {
+            const user = await this.userService.findByEmail(email);
+            if (!user) {
+                const error = createHttpError(
+                    400,
+                    "Email and password dosn't match!",
+                );
+                next(error);
+                return;
+            }
+
+            // compare password
+            const passwordMatch = this.credentialsService.comparePassword(
+                password,
+                user.password,
+            );
+            if (!passwordMatch) {
+                const error = createHttpError(
+                    400,
+                    "Email and password dosn't match!",
+                );
+                next(error);
+                return;
+            }
+            res.status(200).json({ message: "Login successful" });
+        } catch (err) {
+            next(err);
+            return;
+        }
+
+        // generate token
+        // add token to cookies
+        // return reponse
     }
 }
