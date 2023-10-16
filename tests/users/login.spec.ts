@@ -3,7 +3,6 @@ import { AppDataSource } from "../../src/config/data-source";
 import { DataSource } from "typeorm";
 import request from "supertest";
 import { User } from "../../src/entity/User";
-import { Roles } from "../../src/constants";
 
 describe("POST /auth/login", () => {
     let connection: DataSource;
@@ -30,8 +29,8 @@ describe("POST /auth/login", () => {
                 email: "zahid@gmail.com",
                 password: "password",
             };
-            const userRepository = connection.getRepository(User);
-            await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+            await request(app).post("/auth/register").send(userData);
+
             const loginInfo = {
                 email: "zahid@gmail.com",
                 password: "password",
@@ -86,6 +85,8 @@ describe("POST /auth/login", () => {
             expect(users[0].password).toHaveLength(60);
             expect(users[0].password).toMatch(/^\$2b\$\d+\$/);
         });
+
+        it("should return user id ", async () => {});
     });
 
     describe("Fields are missing", () => {
@@ -97,8 +98,8 @@ describe("POST /auth/login", () => {
                 email: "zahid@gmail.com",
                 password: "password",
             };
-            const userRepository = connection.getRepository(User);
-            await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+            await request(app).post("/auth/register").send(userData);
+
             const loginInfo = {
                 email: "",
                 password: "password",
@@ -119,8 +120,8 @@ describe("POST /auth/login", () => {
                 email: "zahid@gmail.com",
                 password: "password",
             };
-            const userRepository = connection.getRepository(User);
-            await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+            await request(app).post("/auth/register").send(userData);
+
             const loginInfo = {
                 email: "zahid@gmail.com",
                 password: "",

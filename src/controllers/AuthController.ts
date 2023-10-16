@@ -84,7 +84,6 @@ export class AuthController {
     }
 
     // Login Method
-
     async login(req: RegisterUserRequest, res: Response, next: NextFunction) {
         // Validation
         const result = validationResult(req);
@@ -111,7 +110,7 @@ export class AuthController {
             }
 
             // compare password
-            const passwordMatch = this.credentialsService.comparePassword(
+            const passwordMatch = await this.credentialsService.comparePassword(
                 password,
                 user.password,
             );
@@ -123,14 +122,44 @@ export class AuthController {
                 next(error);
                 return;
             }
-            res.status(200).json({ message: "Login successful" });
+            // generate token
+            const payload: JwtPayload = {
+                sub: String(user.id),
+                role: user.role,
+            };
+
+            const accessToken = this.tokenService.generateAccessToken(payload);
+
+            const newRefreshToken =
+                await this.tokenService.persistRefreshToken(user);
+
+            const refreshToken = this.tokenService.generateRefreshToken({
+                ...payload,
+                id: String(newRefreshToken.id),
+            });
+
+            res.cookie("accessToken", accessToken, {
+                domain: "localhost",
+                sameSite: "strict",
+                maxAge: 1000 * 60 * 60,
+                httpOnly: true,
+            });
+
+            res.cookie("refreshToken", refreshToken, {
+                domain: "localhost",
+                sameSite: "strict",
+                maxAge: 1000 * 60 * 60 * 24 * 365,
+                httpOnly: true,
+            });
+
+            this.logger.info("User hasb been logged in successfully", {
+                id: user.id,
+            });
+
+            res.status(200).json({ id: user.id });
         } catch (err) {
             next(err);
             return;
         }
-
-        // generate token
-        // add token to cookies
-        // return reponse
     }
 }
