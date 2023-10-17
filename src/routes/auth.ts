@@ -1,14 +1,14 @@
 import express, { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { AuthController } from "../controllers/AuthController";
-import { UserService } from "../service/UserService";
+import { UserService } from "../services/UserService";
 import { User } from "../entity/User";
 import logger from "../config/logger";
 import registerValidators from "../validators/register-validators";
-import { TokenService } from "../service/TokenService";
+import { TokenService } from "../services/TokenService";
 import { RefreshToken } from "../entity/RefreshToken";
 import loginValidators from "../validators/login-validators";
-import { CredentialService } from "../service/CredentialService";
+import { CredentialService } from "../services/CredentialService";
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);

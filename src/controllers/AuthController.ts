@@ -1,12 +1,12 @@
 import { Response, NextFunction } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { Logger } from "winston";
-import { UserService } from "../service/UserService";
-import { TokenService } from "../service/TokenService";
+import { UserService } from "../services/UserService";
+import { TokenService } from "../services/TokenService";
 import { RegisterUserRequest } from "../types";
 import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
-import { CredentialService } from "../service/CredentialService";
+import { CredentialService } from "../services/CredentialService";
 
 export class AuthController {
     constructor(
