@@ -3,7 +3,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { Logger } from "winston";
 import { UserService } from "../services/UserService";
 import { TokenService } from "../services/TokenService";
-import { RegisterUserRequest } from "../types";
+import { AuthRequest, RegisterUserRequest } from "../types";
 import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
 import { CredentialService } from "../services/CredentialService";
@@ -161,5 +161,10 @@ export class AuthController {
             next(err);
             return;
         }
+    }
+
+    async self(req: AuthRequest, res: Response) {
+        const userInfo = await this.userService.findById(Number(req.auth.sub));
+        res.json(userInfo);
     }
 }
