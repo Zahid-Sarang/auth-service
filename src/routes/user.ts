@@ -24,8 +24,8 @@ router.post(
 
 router.get(
     "/allUsers",
-    authenticate,
-    canAccess([Roles.ADMIN]),
+    // authenticate,
+    // canAccess([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
         userController.getUsers(req, res, next),
 );

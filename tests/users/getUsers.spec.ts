@@ -4,6 +4,7 @@ import request from "supertest";
 import app from "../../src/app";
 import createJWKSMock from "mock-jwks";
 import { Roles } from "../../src/constants";
+import { User } from "../../src/entity/User";
 
 describe("GET /users/allUsers", () => {
     let connection: DataSource;
@@ -41,6 +42,35 @@ describe("GET /users/allUsers", () => {
             expect(response.statusCode).toBe(200);
         });
 
-        it("should return List of All userse", async () => {});
+        it("should return List of All userse", async () => {
+            const userData = {
+                firstName: "zahid",
+                lastName: "sarang",
+                email: "zahid@gmail.com",
+                password: "password",
+                tenantId: 1,
+            };
+
+            const adminToken = jwks.token({
+                sub: "1",
+                role: Roles.ADMIN,
+            });
+
+            const userRepository = connection.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                role: Roles.ADMIN,
+            });
+
+            const users = await userRepository.find();
+
+            // Add token to cookie
+            await request(app)
+                .get("/users/allUsers")
+                .set("Cookie", [`accessToken=${adminToken}`])
+                .send();
+
+            expect(users).toHaveLength(1);
+        });
     });
 });

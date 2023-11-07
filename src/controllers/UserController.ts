@@ -30,7 +30,8 @@ export class UserController {
 
     async getUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            res.status(200).json({});
+            const usersList = await this.userService.getAllUsers();
+            res.json({ ...usersList, password: undefined });
         } catch (err) {
             next(err);
         }
