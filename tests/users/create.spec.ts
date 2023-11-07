@@ -89,6 +89,30 @@ describe("POST /users", () => {
             expect(users[0].role).toBe(Roles.MANAGER);
         });
 
+        it("should return 400 status code if any field is missing", async () => {
+            // Register user
+            const userData = {
+                firstName: "zahid",
+                lastName: "sarang",
+                email: "zahid@gmail.com",
+                password: "",
+                tenantId: 1,
+            };
+
+            const adminToken = jwks.token({
+                sub: "1",
+                role: Roles.ADMIN,
+            });
+
+            // Add token to cookie
+            const response = await request(app)
+                .post("/users")
+                .set("Cookie", [`accessToken=${adminToken}`])
+                .send(userData);
+
+            expect(response.statusCode).toBe(400);
+        });
+
         it.todo("should return 403 if non admin user tries to create a user");
     });
 });
