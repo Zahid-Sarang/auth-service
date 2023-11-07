@@ -65,12 +65,27 @@ describe("GET /users/allUsers", () => {
             const users = await userRepository.find();
 
             // Add token to cookie
-            await request(app)
+            const response = await request(app)
                 .get("/users/allUsers")
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send();
 
-            expect(users).toHaveLength(1);
+            const keys = Object.keys(response.body as Record<string, string>);
+
+            const userArray = keys.map(
+                (key) => (response.body as Record<string, string>)[key],
+            );
+            expect(Array.isArray(userArray)).toBe(true);
+            expect(userArray.length).toBe(users.length);
+            for (let i = 0; i < users.length; i++) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                const userInResponse = response.body[i] as Record<
+                    string,
+                    string
+                >;
+                const userInDatabase = users[i];
+                expect(userInResponse.email).toBe(userInDatabase.email);
+            }
         });
     });
 });
