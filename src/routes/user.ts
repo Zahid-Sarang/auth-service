@@ -7,7 +7,9 @@ import { User } from "../entity/User";
 import authenticate from "../middleware/authenticate";
 import { canAccess } from "../middleware/canAccess";
 import { UserService } from "../services/UserService";
-import registerValidators from "../validators/register-validators";
+import { UpdateUserRequest } from "../types";
+import createUserValidator from "../validators/create-user-validator";
+import updateUserValidators from "../validators/update-user-validators";
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -16,7 +18,7 @@ const userController = new UserController(userService, logger);
 
 router.post(
     "/",
-    registerValidators,
+    createUserValidator,
     authenticate,
     canAccess([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
@@ -37,6 +39,15 @@ router.get(
     canAccess([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
         userController.getOneUser(req, res, next),
+);
+
+router.patch(
+    "/:id",
+    updateUserValidators,
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    (req: UpdateUserRequest, res: Response, next: NextFunction) =>
+        userController.updateUser(req, res, next),
 );
 
 export default router;
