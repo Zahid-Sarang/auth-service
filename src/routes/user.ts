@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
+import logger from "../config/logger";
 import { Roles } from "../constants";
 import { UserController } from "../controllers/UserController";
 import { User } from "../entity/User";
@@ -11,7 +12,7 @@ import registerValidators from "../validators/register-validators";
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService(userRepository);
-const userController = new UserController(userService);
+const userController = new UserController(userService, logger);
 
 router.post(
     "/",
@@ -23,7 +24,7 @@ router.post(
 );
 
 router.get(
-    "/allUsers",
+    "/",
     authenticate,
     // canAccess([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>

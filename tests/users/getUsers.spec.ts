@@ -6,7 +6,7 @@ import createJWKSMock from "mock-jwks";
 import { Roles } from "../../src/constants";
 import { User } from "../../src/entity/User";
 
-describe("GET /users/allUsers", () => {
+describe("GET /users", () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
 
@@ -35,7 +35,7 @@ describe("GET /users/allUsers", () => {
                 role: Roles.ADMIN,
             });
             const response = await request(app)
-                .get("/users/allUsers")
+                .get("/users/")
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send();
 
@@ -66,7 +66,7 @@ describe("GET /users/allUsers", () => {
 
             // Add token to cookie
             const response = await request(app)
-                .get("/users/allUsers")
+                .get("/users/")
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send();
 
@@ -112,7 +112,7 @@ describe("GET /users/allUsers", () => {
 
             // Add token to cookie
             const response = await request(app)
-                .get("/users/allUsers")
+                .get("/users/")
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send();
 

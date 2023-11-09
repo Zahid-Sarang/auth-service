@@ -3,9 +3,13 @@ import { Roles } from "../constants";
 import { UserService } from "../services/UserService";
 import { CreateUserRequest } from "../types";
 import { validationResult } from "express-validator";
+import { Logger } from "winston";
 
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(
+        private userService: UserService,
+        private logger: Logger,
+    ) {}
 
     async create(req: CreateUserRequest, res: Response, next: NextFunction) {
         // Validation
@@ -31,7 +35,8 @@ export class UserController {
     async getUsers(req: Request, res: Response, next: NextFunction) {
         try {
             const usersList = await this.userService.getAllUsers();
-            res.json({ ...usersList, password: undefined });
+            this.logger.info("All users have been fetched");
+            res.json(usersList);
         } catch (err) {
             next(err);
         }

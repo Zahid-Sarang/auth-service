@@ -101,7 +101,7 @@ export class AuthController {
 
         // check if email is existing in database
         try {
-            const user = await this.userService.findByEmail(email);
+            const user = await this.userService.findByEmailWithPassword(email);
             if (!user) {
                 const error = createHttpError(
                     400,
