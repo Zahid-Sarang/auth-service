@@ -14,10 +14,11 @@ export class UserController {
 
     async create(req: CreateUserRequest, res: Response, next: NextFunction) {
         // Validation
-        const validationError = validationResult(req);
-        if (!validationError.isEmpty()) {
-            return res.status(400).json({ error: validationError.array() });
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ errors: result.array() });
         }
+
         const { firstName, lastName, email, password } = req.body;
         try {
             const user = await this.userService.create({
@@ -35,7 +36,7 @@ export class UserController {
 
     async getUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            const usersList = await this.userService.getAllUsers();
+            const usersList = await this.userService.getAll();
             this.logger.info("All users have been fetched");
             res.json(usersList);
         } catch (err) {

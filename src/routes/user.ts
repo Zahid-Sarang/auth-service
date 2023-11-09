@@ -7,7 +7,7 @@ import { User } from "../entity/User";
 import authenticate from "../middleware/authenticate";
 import { canAccess } from "../middleware/canAccess";
 import { UserService } from "../services/UserService";
-import { UpdateUserRequest } from "../types";
+import { CreateUserRequest, UpdateUserRequest } from "../types";
 import createUserValidator from "../validators/create-user-validator";
 import updateUserValidators from "../validators/update-user-validators";
 
@@ -18,10 +18,10 @@ const userController = new UserController(userService, logger);
 
 router.post(
     "/",
-    createUserValidator,
     authenticate,
     canAccess([Roles.ADMIN]),
-    (req: Request, res: Response, next: NextFunction) =>
+    createUserValidator,
+    (req: CreateUserRequest, res: Response, next: NextFunction) =>
         userController.create(req, res, next),
 );
 
@@ -43,9 +43,9 @@ router.get(
 
 router.patch(
     "/:id",
-    updateUserValidators,
     authenticate,
     canAccess([Roles.ADMIN]),
+    updateUserValidators,
     (req: UpdateUserRequest, res: Response, next: NextFunction) =>
         userController.updateUser(req, res, next),
 );

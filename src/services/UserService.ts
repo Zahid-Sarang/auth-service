@@ -1,31 +1,32 @@
-import createHttpError from "http-errors";
 import { Repository } from "typeorm";
+import bcrypt from "bcrypt";
 import { User } from "../entity/User";
 import { LimitedUserData, UserData } from "../types";
-import bcrypt from "bcrypt";
+import createHttpError from "http-errors";
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
+
     async create({ firstName, lastName, email, password, role }: UserData) {
         const user = await this.userRepository.findOne({
             where: { email: email },
         });
         if (user) {
-            const error = createHttpError(400, "Email is already in exists!");
-            throw error;
+            const err = createHttpError(400, "Email is already exists!");
+            throw err;
         }
         // Hash the password
-        const saltRound = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRound);
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         try {
-            const user = await this.userRepository.save({
+            return await this.userRepository.save({
                 firstName,
                 lastName,
                 email,
                 password: hashedPassword,
                 role,
             });
-            return user;
         } catch (err) {
             const error = createHttpError(
                 500,
@@ -37,7 +38,9 @@ export class UserService {
 
     async findByEmailWithPassword(email: string) {
         return await this.userRepository.findOne({
-            where: { email },
+            where: {
+                email,
+            },
             select: [
                 "id",
                 "firstName",
@@ -57,10 +60,6 @@ export class UserService {
         });
     }
 
-    async getAllUsers() {
-        return await this.userRepository.find();
-    }
-
     async update(
         userId: number,
         { firstName, lastName, role }: LimitedUserData,
@@ -78,6 +77,10 @@ export class UserService {
             );
             throw error;
         }
+    }
+
+    async getAll() {
+        return await this.userRepository.find();
     }
 
     async deleteById(userId: number) {

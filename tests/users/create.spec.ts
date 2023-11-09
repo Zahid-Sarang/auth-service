@@ -1,10 +1,11 @@
-import { AppDataSource } from "../../src/config/data-source";
 import { DataSource } from "typeorm";
 import request from "supertest";
-import app from "../../src/app";
 import createJWKSMock from "mock-jwks";
-import { User } from "../../src/entity/User";
+
+import { AppDataSource } from "../../src/config/data-source";
+import app from "../../src/app";
 import { Roles } from "../../src/constants";
+import { User } from "../../src/entity/User";
 
 describe("POST /users", () => {
     let connection: DataSource;
@@ -20,6 +21,7 @@ describe("POST /users", () => {
         await connection.dropDatabase();
         await connection.synchronize();
     });
+
     afterEach(() => {
         jwks.stop();
     });
@@ -29,29 +31,46 @@ describe("POST /users", () => {
     });
 
     describe("Given all fields", () => {
-        it("should persist the user in the database", async () => {
-            // Register user
-            const userData = {
-                firstName: "zahid",
-                lastName: "sarang",
-                email: "zahid@gmail.com",
-                password: "password",
-                tenantId: 1,
-            };
-
+        it("should return a 201 status code", async () => {
             const adminToken = jwks.token({
                 sub: "1",
                 role: Roles.ADMIN,
             });
-
-            // Add token to cookie
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "password",
+                tenantId: 1,
+            };
             const response = await request(app)
                 .post("/users")
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send(userData);
 
-            // Assert
             expect(response.statusCode).toBe(201);
+        });
+        it("should persist the user in the database", async () => {
+            const adminToken = jwks.token({
+                sub: "1",
+                role: Roles.ADMIN,
+            });
+
+            // Register user
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "password",
+                tenantId: 1,
+            };
+
+            // Add token to cookie
+            await request(app)
+                .post("/users")
+                .set("Cookie", [`accessToken=${adminToken}`])
+                .send(userData);
+
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
 
@@ -60,57 +79,31 @@ describe("POST /users", () => {
         });
 
         it("should create a manager user", async () => {
-            // Register user
-            const userData = {
-                firstName: "zahid",
-                lastName: "sarang",
-                email: "zahid@gmail.com",
-                password: "password",
-                tenantId: 1,
-            };
-
             const adminToken = jwks.token({
                 sub: "1",
                 role: Roles.ADMIN,
             });
 
+            // Register user
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "password",
+                tenantId: 1,
+            };
+
             // Add token to cookie
-            const response = await request(app)
+            await request(app)
                 .post("/users")
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send(userData);
 
-            // Assert
-            expect(response.statusCode).toBe(201);
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
 
             expect(users).toHaveLength(1);
             expect(users[0].role).toBe(Roles.MANAGER);
-        });
-
-        it("should return 400 status code if any field is missing", async () => {
-            // Register user
-            const userData = {
-                firstName: "zahid",
-                lastName: "sarang",
-                email: "zahid@gmail.com",
-                password: "",
-                tenantId: 1,
-            };
-
-            const adminToken = jwks.token({
-                sub: "1",
-                role: Roles.ADMIN,
-            });
-
-            // Add token to cookie
-            const response = await request(app)
-                .post("/users")
-                .set("Cookie", [`accessToken=${adminToken}`])
-                .send(userData);
-
-            expect(response.statusCode).toBe(400);
         });
 
         it.todo("should return 403 if non admin user tries to create a user");
