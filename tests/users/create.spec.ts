@@ -37,9 +37,9 @@ describe("POST /users", () => {
                 role: Roles.ADMIN,
             });
             const userData = {
-                firstName: "Rakesh",
-                lastName: "K",
-                email: "rakesh@mern.space",
+                firstName: "Zahid",
+                lastName: "Sarang",
+                email: "zahid@mern.space",
                 password: "password",
                 tenantId: 1,
             };
@@ -58,9 +58,9 @@ describe("POST /users", () => {
 
             // Register user
             const userData = {
-                firstName: "Rakesh",
-                lastName: "K",
-                email: "rakesh@mern.space",
+                firstName: "Zahid",
+                lastName: "Sarang",
+                email: "zahid@mern.space",
                 password: "password",
                 tenantId: 1,
             };
