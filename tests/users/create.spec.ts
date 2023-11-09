@@ -106,6 +106,28 @@ describe("POST /users", () => {
             expect(users[0].role).toBe(Roles.MANAGER);
         });
 
-        it.todo("should return 403 if non admin user tries to create a user");
+        it("should return 403 if non admin user tries to create a user", async () => {
+            const adminToken = jwks.token({
+                sub: "1",
+                role: Roles.CUSTOMER,
+            });
+
+            // Register user
+            const userData = {
+                firstName: "Zahid",
+                lastName: "Sarang",
+                email: "zahid@mern.space",
+                password: "password",
+                tenantId: 1,
+            };
+
+            // Add token to cookie
+            const response = await request(app)
+                .post("/users")
+                .set("Cookie", [`accessToken=${adminToken}`])
+                .send(userData);
+
+            expect(response.statusCode).toBe(403);
+        });
     });
 });
