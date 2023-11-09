@@ -26,9 +26,17 @@ router.post(
 router.get(
     "/",
     authenticate,
-    // canAccess([Roles.ADMIN]),
+    canAccess([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
         userController.getUsers(req, res, next),
+);
+
+router.get(
+    "/:id",
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.getOneUser(req, res, next),
 );
 
 export default router;
