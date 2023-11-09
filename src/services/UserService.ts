@@ -61,7 +61,7 @@ export class UserService {
         return await this.userRepository.find();
     }
 
-    async updateUser(
+    async update(
         userId: number,
         { firstName, lastName, role }: LimitedUserData,
     ) {
@@ -78,5 +78,9 @@ export class UserService {
             );
             throw error;
         }
+    }
+
+    async deleteById(userId: number) {
+        return await this.userRepository.delete(userId);
     }
 }

@@ -50,4 +50,13 @@ router.patch(
         userController.updateUser(req, res, next),
 );
 
+router.delete(
+    "/:id",
+    updateUserValidators,
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    (req: UpdateUserRequest, res: Response, next: NextFunction) =>
+        userController.deleteUser(req, res, next),
+);
+
 export default router;
