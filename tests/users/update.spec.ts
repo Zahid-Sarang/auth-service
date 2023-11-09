@@ -58,6 +58,38 @@ describe("PATCH /users/:id", () => {
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send(updateData);
 
+            expect(response.statusCode).toBe(200);
+        });
+
+        it("should return updated user data", async () => {
+            const adminToken = jwks.token({
+                sub: "1",
+                role: Roles.ADMIN,
+            });
+            const userData = {
+                firstName: "Zahid",
+                lastName: "Sarang",
+                email: "zahid@mern.space",
+                password: "password",
+                role: Roles.CUSTOMER,
+                tenantId: 1,
+            };
+
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.save(userData);
+
+            const updateData = {
+                firstName: "Sarang",
+                lastName: "Zahid",
+                role: Roles.MANAGER,
+            };
+            const id = users.id;
+
+            const response = await request(app)
+                .patch(`/users/${id}`)
+                .set("Cookie", [`accessToken=${adminToken}`])
+                .send(updateData);
+
             const findUser = await userRepository.findOne({
                 where: {
                     id: Number((response.body as Record<string, string>).id),
