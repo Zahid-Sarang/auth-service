@@ -7,6 +7,7 @@ import { Tenant } from "../entity/Tenant";
 import authenticate from "../middleware/authenticate";
 import { canAccess } from "../middleware/canAccess";
 import { TenantService } from "../services/TenantService";
+import tenantValidator from "../validators/tenant-validator";
 
 const router = express.Router();
 const tenantRepository = AppDataSource.getRepository(Tenant);
@@ -17,6 +18,7 @@ router.post(
     "/",
     authenticate,
     canAccess([Roles.ADMIN]),
+    tenantValidator,
     (req: Request, res: Response, next: NextFunction) =>
         tenantController.create(req, res, next),
 );

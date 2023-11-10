@@ -38,7 +38,7 @@ describe("POST /tenants", () => {
         it("should return a 201 status code", async () => {
             const tenantData = {
                 name: "Tenant Name",
-                address: " Tenant Address",
+                address: "Tenant Address",
             };
             const response = await request(app)
                 .post("/tenants")
@@ -49,8 +49,8 @@ describe("POST /tenants", () => {
         });
         it("should create a new tenant in the database", async () => {
             const tenantData = {
-                name: "Tenant Name",
-                address: " Tenant Address",
+                name: "Tenant name",
+                address: "Tenant Address",
             };
             await request(app)
                 .post("/tenants")
@@ -88,7 +88,7 @@ describe("POST /tenants", () => {
             });
             const tenantData = {
                 name: "Tenant Name",
-                address: " Tenant Address",
+                address: "Tenant Address",
             };
             const response = await request(app)
                 .post("/tenants")
@@ -99,6 +99,26 @@ describe("POST /tenants", () => {
             const tenantRepository = connection.getRepository(Tenant);
             const tenants = await tenantRepository.find();
 
+            expect(tenants).toHaveLength(0);
+        });
+        it("should return 400 status code if name and address is missing ", async () => {
+            const managerToken = jwks.token({
+                sub: "1",
+                role: Roles.ADMIN,
+            });
+            const tenantData = {
+                name: "",
+                address: "Tenant Address",
+            };
+            const response = await request(app)
+                .post("/tenants")
+                .send(tenantData)
+                .set("Cookie", [`accessToken=${managerToken}`]);
+
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenants = await tenantRepository.find();
+
+            expect(response.statusCode).toBe(400);
             expect(tenants).toHaveLength(0);
         });
     });
