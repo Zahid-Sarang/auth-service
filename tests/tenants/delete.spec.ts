@@ -7,7 +7,7 @@ import { Tenant } from "../../src/entity/Tenant";
 import createJWKSMock from "mock-jwks";
 import { Roles } from "../../src/constants";
 
-describe("PATCH /tenants/:id", () => {
+describe("DELETE /tenants/:id", () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
     let adminToken: string;
@@ -44,13 +44,13 @@ describe("PATCH /tenants/:id", () => {
             const tenantRepository = connection.getRepository(Tenant);
             const tenant = await tenantRepository.save(tenantData);
             const response = await request(app)
-                .patch(`/tenants/${tenant.id}`)
+                .delete(`/tenants/${tenant.id}`)
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send(tenantData);
 
             expect(response.statusCode).toBe(200);
         });
-        it("should return updated tenant Data", async () => {
+        it("should check tenant not persist in database ", async () => {
             const tenantData = {
                 name: "Tenant Name",
                 address: "Tenant Address",
@@ -58,23 +58,13 @@ describe("PATCH /tenants/:id", () => {
 
             const tenantRepository = connection.getRepository(Tenant);
             const tenant = await tenantRepository.save(tenantData);
-
-            const updateData = {
-                name: "jhone",
-                address: "Mumbai",
-            };
-            const response = await request(app)
-                .patch(`/tenants/${tenant.id}`)
+            await request(app)
+                .delete(`/tenants/${tenant.id}`)
                 .set("Cookie", [`accessToken=${adminToken}`])
-                .send(updateData);
+                .send(tenantData);
 
-            const findTenant = await tenantRepository.findOne({
-                where: {
-                    id: Number((response.body as Record<string, string>).id),
-                },
-            });
-            expect(findTenant?.name).toBe(updateData.name);
-            expect(findTenant?.address).toBe(updateData.address);
+            const deleteTenat = await tenantRepository.find();
+            expect(deleteTenat).toHaveLength(0);
         });
     });
 });
