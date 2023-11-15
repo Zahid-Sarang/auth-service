@@ -23,4 +23,12 @@ router.post(
         tenantController.create(req, res, next),
 );
 
+router.get(
+    "/",
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        tenantController.getTenant(req, res, next),
+);
+
 export default router;
