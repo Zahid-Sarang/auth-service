@@ -1,5 +1,6 @@
 import { Response, NextFunction, Request } from "express";
 import { validationResult } from "express-validator";
+import createHttpError from "http-errors";
 import { Logger } from "winston";
 import { TenantService } from "../services/TenantService";
 import { CreateTenantRequest } from "../types";
@@ -29,9 +30,29 @@ export class TenantController {
     async getTenant(req: Request, res: Response, next: NextFunction) {
         try {
             const tenants = await this.tenantService.getTenants();
+            this.logger.info("All tenant have been fetched");
             res.json(tenants);
         } catch (err) {
             next(err);
+        }
+    }
+
+    async getOneTenant(req: Request, res: Response, next: NextFunction) {
+        const tenantId = req.params.id;
+
+        if (isNaN(Number(tenantId))) {
+            next(createHttpError(400, "Invalid tenant Id"));
+            return;
+        }
+        try {
+            const tenant = await this.tenantService.findById(Number(tenantId));
+            if (!tenant) {
+                next(createHttpError(400, "Tenant does not exist"));
+            }
+            this.logger.info("Tenanthas been fetched");
+            res.json(tenant);
+        } catch (error) {
+            next(error);
         }
     }
 }

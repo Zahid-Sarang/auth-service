@@ -7,10 +7,10 @@ import { Tenant } from "../../src/entity/Tenant";
 import createJWKSMock from "mock-jwks";
 import { Roles } from "../../src/constants";
 
-describe("GET /tenants", () => {
+describe("GET /tenants/:id", () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
-    let accessToken: string;
+    let adminToken: string;
 
     beforeAll(async () => {
         jwks = createJWKSMock("http://localhost:8000");
@@ -22,9 +22,9 @@ describe("GET /tenants", () => {
         await connection.dropDatabase();
         await connection.synchronize();
 
-        accessToken = jwks.token({
+        adminToken = jwks.token({
             sub: "1",
-            role: Roles.CUSTOMER,
+            role: Roles.ADMIN,
         });
     });
     afterEach(() => {
@@ -42,33 +42,38 @@ describe("GET /tenants", () => {
             };
 
             const tenantRepository = connection.getRepository(Tenant);
-            await tenantRepository.save(tenantData);
+            const tenant = await tenantRepository.save(tenantData);
+            const tenantId = tenant.id;
             const response = await request(app)
-                .get("/tenants")
-                .set("Cookie", [`accessToken=${accessToken}`])
+                .get(`/tenants/${tenantId}`)
+                .set("Cookie", [`accessToken=${adminToken}`])
                 .send(tenantData);
 
             expect(response.statusCode).toBe(200);
         });
-        it("should return a List of all tenant", async () => {
-            const tenantData = [
-                {
-                    name: "Tenant Name",
-                    address: "Tenant Address",
-                },
-                {
-                    name: "jhon",
-                    address: "new York",
-                },
-            ];
+        it("should return a tenant by Id", async () => {
+            const tenantData = {
+                name: "Tenant Name",
+                address: "Tenant Address",
+            };
 
             const tenantRepository = connection.getRepository(Tenant);
             const tenant = await tenantRepository.save(tenantData);
+            const tenantId = tenant.id;
             const response = await request(app)
-                .get("/tenants")
-                .set("Cookie", [`accessToken=${accessToken}`])
+                .get(`/tenants/${tenantId}`)
+                .set("Cookie", [`accessToken=${adminToken}`])
                 .send(tenantData);
-            expect(response.body).toHaveLength(tenant.length);
+
+            expect((response.body as Record<string, string>).id).toBe(
+                tenant.id,
+            );
+            expect((response.body as Record<string, string>).name).toBe(
+                tenant.name,
+            );
+            expect((response.body as Record<string, string>).address).toBe(
+                tenant.address,
+            );
         });
     });
 });
