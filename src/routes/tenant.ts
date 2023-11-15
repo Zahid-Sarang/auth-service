@@ -24,11 +24,8 @@ router.post(
         tenantController.create(req, res, next),
 );
 
-router.get(
-    "/",
-    authenticate,
-    (req: Request, res: Response, next: NextFunction) =>
-        tenantController.getTenant(req, res, next),
+router.get("/", (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getTenant(req, res, next),
 );
 
 router.get(

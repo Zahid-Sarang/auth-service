@@ -4,32 +4,21 @@ import request from "supertest";
 import { AppDataSource } from "../../src/config/data-source";
 import app from "../../src/app";
 import { Tenant } from "../../src/entity/Tenant";
-import createJWKSMock from "mock-jwks";
-import { Roles } from "../../src/constants";
 
 describe("GET /tenants", () => {
     let connection: DataSource;
-    let jwks: ReturnType<typeof createJWKSMock>;
+
     let accessToken: string;
 
     beforeAll(async () => {
-        jwks = createJWKSMock("http://localhost:8000");
         connection = await AppDataSource.initialize();
     });
 
     beforeEach(async () => {
-        jwks.start();
         await connection.dropDatabase();
         await connection.synchronize();
+    });
 
-        accessToken = jwks.token({
-            sub: "1",
-            role: Roles.CUSTOMER,
-        });
-    });
-    afterEach(() => {
-        jwks.stop();
-    });
     afterAll(async () => {
         await connection.destroy();
     });
@@ -45,7 +34,6 @@ describe("GET /tenants", () => {
             await tenantRepository.save(tenantData);
             const response = await request(app)
                 .get("/tenants")
-                .set("Cookie", [`accessToken=${accessToken}`])
                 .send(tenantData);
 
             expect(response.statusCode).toBe(200);
