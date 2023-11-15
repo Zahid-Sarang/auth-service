@@ -107,7 +107,7 @@ describe("POST /users", () => {
         });
 
         it("should return 403 if non admin user tries to create a user", async () => {
-            const adminToken = jwks.token({
+            const coustomerToken = jwks.token({
                 sub: "1",
                 role: Roles.CUSTOMER,
             });
@@ -124,7 +124,7 @@ describe("POST /users", () => {
             // Add token to cookie
             const response = await request(app)
                 .post("/users")
-                .set("Cookie", [`accessToken=${adminToken}`])
+                .set("Cookie", [`accessToken=${coustomerToken}`])
                 .send(userData);
 
             expect(response.statusCode).toBe(403);

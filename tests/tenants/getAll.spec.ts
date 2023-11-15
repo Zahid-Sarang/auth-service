@@ -70,5 +70,24 @@ describe("GET /tenants", () => {
                 .send(tenantData);
             expect(response.body).toHaveLength(tenant.length);
         });
+        it("should return a 403 status code if non admin user try to access", async () => {
+            const managerToken = jwks.token({
+                sub: "1",
+                role: Roles.MANAGER,
+            });
+            const tenantData = {
+                name: "Tenant Name",
+                address: "Tenant Address",
+            };
+
+            const tenantRepository = connection.getRepository(Tenant);
+            await tenantRepository.save(tenantData);
+            const response = await request(app)
+                .get("/tenants")
+                .set("Cookie", [`accessToken=${managerToken}`])
+                .send(tenantData);
+
+            expect(response.statusCode).toBe(403);
+        });
     });
 });
