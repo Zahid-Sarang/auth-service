@@ -7,6 +7,7 @@ import { Tenant } from "../entity/Tenant";
 import authenticate from "../middleware/authenticate";
 import { canAccess } from "../middleware/canAccess";
 import { TenantService } from "../services/TenantService";
+import { CreateTenantRequest } from "../types";
 import tenantValidator from "../validators/tenant-validator";
 
 const router = express.Router();
@@ -35,6 +36,15 @@ router.get(
     authenticate,
     (req: Request, res: Response, next: NextFunction) =>
         tenantController.getOneTenant(req, res, next),
+);
+
+router.patch(
+    "/:id",
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    tenantValidator,
+    (req: CreateTenantRequest, res: Response, next: NextFunction) =>
+        tenantController.update(req, res, next),
 );
 
 export default router;

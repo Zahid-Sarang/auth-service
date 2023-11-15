@@ -19,4 +19,8 @@ export class TenantService {
             },
         });
     }
+
+    async update(id: number, tenantData: ITenant) {
+        return await this.tenantRepository.update(id, tenantData);
+    }
 }
