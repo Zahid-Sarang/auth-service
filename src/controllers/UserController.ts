@@ -5,11 +5,13 @@ import { CreateUserRequest, UpdateUserRequest } from "../types";
 import { validationResult } from "express-validator";
 import { Logger } from "winston";
 import createHttpError from "http-errors";
+import { TokenService } from "../services/TokenService";
 
 export class UserController {
     constructor(
         private userService: UserService,
         private logger: Logger,
+        private tokenService: TokenService,
     ) {}
 
     async create(req: CreateUserRequest, res: Response, next: NextFunction) {
@@ -110,12 +112,16 @@ export class UserController {
         }
 
         try {
+            // Delete the user refreshToken
+            await this.tokenService.deleteUserRefreshToken(Number(userId));
+
+            // Delete the user
             await this.userService.deleteById(Number(userId));
 
             this.logger.info("User has been deleted!", {
                 id: Number(userId),
             });
-            res.json({ id: Number(userId) });
+            res.json({ message: "User deleted" });
         } catch (err) {
             next(err);
         }

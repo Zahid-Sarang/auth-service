@@ -3,9 +3,11 @@ import { AppDataSource } from "../config/data-source";
 import logger from "../config/logger";
 import { Roles } from "../constants";
 import { UserController } from "../controllers/UserController";
+import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
 import authenticate from "../middleware/authenticate";
 import { canAccess } from "../middleware/canAccess";
+import { TokenService } from "../services/TokenService";
 import { UserService } from "../services/UserService";
 import { CreateUserRequest, UpdateUserRequest } from "../types";
 import createUserValidator from "../validators/create-user-validator";
@@ -14,7 +16,9 @@ import updateUserValidators from "../validators/update-user-validators";
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService(userRepository);
-const userController = new UserController(userService, logger);
+const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+const tokenService = new TokenService(refreshTokenRepository);
+const userController = new UserController(userService, logger, tokenService);
 
 router.post(
     "/",
