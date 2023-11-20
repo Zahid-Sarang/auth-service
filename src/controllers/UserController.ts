@@ -112,9 +112,6 @@ export class UserController {
         }
 
         try {
-            // Delete the user refreshToken
-            await this.tokenService.deleteUserRefreshToken(Number(userId));
-
             // Delete the user
             await this.userService.deleteById(Number(userId));
 
