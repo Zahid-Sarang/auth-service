@@ -6,6 +6,8 @@ import { AppDataSource } from "../../src/config/data-source";
 import app from "../../src/app";
 import { Roles } from "../../src/constants";
 import { User } from "../../src/entity/User";
+import { createTenant } from "../utils";
+import { Tenant } from "../../src/entity/Tenant";
 
 describe("POST /users", () => {
     let connection: DataSource;
@@ -32,17 +34,24 @@ describe("POST /users", () => {
 
     describe("Given all fields", () => {
         it("should return a 201 status code", async () => {
+            // Create tenant first
+            const tenant = await createTenant(connection.getRepository(Tenant));
+
             const adminToken = jwks.token({
                 sub: "1",
                 role: Roles.ADMIN,
             });
+
+            // Register user
             const userData = {
-                firstName: "Zahid",
-                lastName: "Sarang",
-                email: "zahid@mern.space",
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
                 password: "password",
-                tenantId: 1,
+                tenantId: tenant.id,
+                role: Roles.MANAGER,
             };
+
             const response = await request(app)
                 .post("/users")
                 .set("Cookie", [`accessToken=${adminToken}`])
@@ -51,6 +60,9 @@ describe("POST /users", () => {
             expect(response.statusCode).toBe(201);
         });
         it("should persist the user in the database", async () => {
+            // Create tenant first
+            const tenant = await createTenant(connection.getRepository(Tenant));
+
             const adminToken = jwks.token({
                 sub: "1",
                 role: Roles.ADMIN,
@@ -58,11 +70,12 @@ describe("POST /users", () => {
 
             // Register user
             const userData = {
-                firstName: "Zahid",
-                lastName: "Sarang",
-                email: "zahid@mern.space",
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
                 password: "password",
-                tenantId: 1,
+                tenantId: tenant.id,
+                role: Roles.MANAGER,
             };
 
             // Add token to cookie
@@ -79,6 +92,9 @@ describe("POST /users", () => {
         });
 
         it("should create a manager user", async () => {
+            // Create tenant first
+            const tenant = await createTenant(connection.getRepository(Tenant));
+
             const adminToken = jwks.token({
                 sub: "1",
                 role: Roles.ADMIN,
@@ -90,7 +106,8 @@ describe("POST /users", () => {
                 lastName: "K",
                 email: "rakesh@mern.space",
                 password: "password",
-                tenantId: 1,
+                tenantId: tenant.id,
+                role: Roles.MANAGER,
             };
 
             // Add token to cookie
@@ -107,6 +124,9 @@ describe("POST /users", () => {
         });
 
         it("should return 403 if non admin user tries to create a user", async () => {
+            // Create tenant first
+            const tenant = await createTenant(connection.getRepository(Tenant));
+
             const coustomerToken = jwks.token({
                 sub: "1",
                 role: Roles.CUSTOMER,
@@ -114,11 +134,12 @@ describe("POST /users", () => {
 
             // Register user
             const userData = {
-                firstName: "Zahid",
-                lastName: "Sarang",
-                email: "zahid@mern.space",
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
                 password: "password",
-                tenantId: 1,
+                tenantId: tenant.id,
+                role: Roles.MANAGER,
             };
 
             // Add token to cookie
