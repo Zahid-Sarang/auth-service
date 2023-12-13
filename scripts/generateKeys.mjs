@@ -13,7 +13,5 @@ const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
     },
 });
 
-// console.log(`publicKey: ${publicKey} `);
-// console.log(`privateKey: ${privateKey}`);
 fs.writeFileSync("certs/privateKey.pem", privateKey);
 fs.writeFileSync("certs/publickKey.pem", publicKey);
