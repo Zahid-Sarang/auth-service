@@ -16,6 +16,25 @@ export class AuthController {
         private tokenService: TokenService,
         private credentialsService: CredentialService,
     ) {}
+    private setCookies(
+        res: Response,
+        accessToken: string,
+        refreshToken: string,
+    ) {
+        res.cookie("accessToken", accessToken, {
+            domain: "localhost",
+            sameSite: "strict",
+            maxAge: 1000 * 60 * 60, // 60 minutes
+            httpOnly: true,
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+            domain: "localhost",
+            sameSite: "strict",
+            maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+            httpOnly: true,
+        });
+    }
     // Register Method
     async register(
         req: RegisterUserRequest,
@@ -64,19 +83,7 @@ export class AuthController {
                 id: String(newRefreshToken.id),
             });
 
-            res.cookie("accessToken", accessToken, {
-                domain: "localhost",
-                sameSite: "strict",
-                maxAge: 1000 * 60 * 60,
-                httpOnly: true,
-            });
-
-            res.cookie("refreshToken", refreshToken, {
-                domain: "localhost",
-                sameSite: "strict",
-                maxAge: 1000 * 60 * 60 * 24 * 365,
-                httpOnly: true,
-            });
+            this.setCookies(res, accessToken, refreshToken);
 
             res.status(201).json({ id: user.id });
         } catch (err) {
@@ -202,19 +209,7 @@ export class AuthController {
                 id: String(newRefreshToken.id),
             });
 
-            res.cookie("accessToken", accessToken, {
-                domain: "localhost",
-                sameSite: "strict",
-                maxAge: 1000 * 60 * 60,
-                httpOnly: true,
-            });
-
-            res.cookie("refreshToken", refreshToken, {
-                domain: "localhost",
-                sameSite: "strict",
-                maxAge: 1000 * 60 * 60 * 24 * 365,
-                httpOnly: true,
-            });
+            this.setCookies(res, accessToken, refreshToken);
 
             res.status(201).json({ id: user.id });
         } catch (err) {
