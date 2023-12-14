@@ -1,4 +1,9 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, {
+    NextFunction,
+    Request,
+    RequestHandler,
+    Response,
+} from "express";
 import { AppDataSource } from "../config/data-source";
 import logger from "../config/logger";
 import { Roles } from "../constants";
@@ -22,45 +27,45 @@ const userController = new UserController(userService, logger, tokenService);
 
 router.post(
     "/",
-    authenticate,
+    authenticate as RequestHandler,
     canAccess([Roles.ADMIN]),
     createUserValidator,
     (req: CreateUserRequest, res: Response, next: NextFunction) =>
-        userController.create(req, res, next),
+        userController.create(req, res, next) as unknown as RequestHandler,
 );
 
 router.get(
     "/",
-    authenticate,
+    authenticate as RequestHandler,
     canAccess([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
-        userController.getUsers(req, res, next),
+        userController.getUsers(req, res, next) as unknown as RequestHandler,
 );
 
 router.get(
     "/:id",
-    authenticate,
+    authenticate as RequestHandler,
     canAccess([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
-        userController.getOneUser(req, res, next),
+        userController.getOneUser(req, res, next) as unknown as RequestHandler,
 );
 
 router.patch(
     "/:id",
-    authenticate,
+    authenticate as RequestHandler,
     canAccess([Roles.ADMIN]),
     updateUserValidators,
     (req: UpdateUserRequest, res: Response, next: NextFunction) =>
-        userController.updateUser(req, res, next),
+        userController.updateUser(req, res, next) as unknown as RequestHandler,
 );
 
 router.delete(
     "/:id",
     updateUserValidators,
-    authenticate,
+    authenticate as RequestHandler,
     canAccess([Roles.ADMIN]),
     (req: UpdateUserRequest, res: Response, next: NextFunction) =>
-        userController.deleteUser(req, res, next),
+        userController.deleteUser(req, res, next) as unknown as RequestHandler,
 );
 
 export default router;
