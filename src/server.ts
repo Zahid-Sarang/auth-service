@@ -2,6 +2,7 @@ import app from "./app";
 import { Config } from "./config";
 import { AppDataSource } from "./config/data-source";
 import logger from "./config/logger";
+import CreateAdminUser from "./config/utlis";
 
 const startServer = async () => {
     const PORT = Config.PORT;
@@ -11,6 +12,7 @@ const startServer = async () => {
         app.listen(PORT, () => {
             logger.info(`Listing on port ${PORT}`);
         });
+        await CreateAdminUser();
     } catch (error: unknown) {
         if (error instanceof Error) {
             logger.error(error.message);
