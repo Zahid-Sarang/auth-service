@@ -13,7 +13,7 @@ const CreateAdminUser = async () => {
         });
         if (isAdminExist) {
             logger.info("Admin user already exists");
-            return;
+            return false;
         }
         const saltRound = 10;
         const hashedPassword = await bcrypt.hash(
@@ -28,7 +28,7 @@ const CreateAdminUser = async () => {
             role: Roles.ADMIN,
         });
         logger.info("Admin user created");
-        return;
+        return true;
     } catch (error) {
         if (error instanceof Error) {
             logger.error(error.message);
