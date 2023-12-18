@@ -28,6 +28,8 @@ jobs:
                   REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
                   JWKS_URI: ${{ secrets.JWKS_URI }}
                   PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+                  ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL}}
+                  ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD}}
             - name: Build-ts
               run: npm run build
             - name: SonarCloud Scan
@@ -41,7 +43,7 @@ jobs:
         needs: build-and-test
         runs-on: ubuntu-latest
         env:
-            IMAGE_NAME: zahidsarang/mernstack_auth_service 
+            IMAGE_NAME: zahidsarang/mernstack_auth_service
             IMAGE_TAG: build-${{ github.run_number }}
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         steps:
