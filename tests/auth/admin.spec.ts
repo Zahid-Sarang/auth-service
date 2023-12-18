@@ -25,7 +25,7 @@ describe("CreateAdmin", () => {
         const userData = {
             firstName: "Zahid",
             lastName: "sarang",
-            email: "Zahid@mern.space",
+            email: "zahidsarang550@gmail.com",
             password: "password",
         };
 
@@ -38,7 +38,14 @@ describe("CreateAdmin", () => {
             role: Roles.ADMIN,
         });
 
+        const users = await userRepository.find();
         const result = await CreateAdmin();
         expect(result).toBe(false);
+        expect(users[0].email).toBe(userData.email);
+    });
+
+    it("should return true if admin created", async () => {
+        const result = await CreateAdmin();
+        expect(result).toBe(true);
     });
 });
