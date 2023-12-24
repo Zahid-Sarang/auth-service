@@ -227,7 +227,7 @@ export class AuthController {
             this.logger.info("User has been logged out", { id: req.auth.sub });
 
             res.clearCookie("accessToken");
-            res.clearCookie("RefreshToken");
+            res.clearCookie("refreshToken");
             res.json({ message: "Sucessfully logged out" });
         } catch (err) {
             next(err);
