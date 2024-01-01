@@ -59,7 +59,7 @@ export class UserController {
             const user = await this.userService.findById(Number(userId));
 
             if (!user) {
-                next(createHttpError(400, "User does not exist."));
+                next(createHttpError(400, "User does not exist!"));
                 return;
             }
 
