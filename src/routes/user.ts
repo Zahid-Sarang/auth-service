@@ -16,6 +16,7 @@ import { TokenService } from "../services/TokenService";
 import { UserService } from "../services/UserService";
 import { CreateUserRequest, UpdateUserRequest } from "../types";
 import createUserValidator from "../validators/create-user-validator";
+import listUsersValidator from "../validators/list-users-validator";
 import updateUserValidators from "../validators/update-user-validators";
 
 const router = express.Router();
@@ -38,6 +39,7 @@ router.get(
     "/",
     authenticate as RequestHandler,
     canAccess([Roles.ADMIN]),
+    listUsersValidator,
     (req: Request, res: Response, next: NextFunction) =>
         userController.getUsers(req, res, next) as unknown as RequestHandler,
 );
