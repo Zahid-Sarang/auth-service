@@ -50,13 +50,19 @@ describe("GET /tenants", () => {
                 },
             ];
 
+            const currentPage = 1;
+            const perPage = 6;
+
             const tenantRepository = connection.getRepository(Tenant);
             const tenant = await tenantRepository.save(tenantData);
             const response = await request(app)
-                .get("/tenants")
+                .get(`/tenants?currentPage=${currentPage}&perPage=${perPage}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send(tenantData);
-            expect(response.body).toHaveLength(tenant.length);
+            expect(response.body).toHaveProperty("currentPage");
+            expect(response.body).toHaveProperty("perPage");
+            expect(response.body).toHaveProperty("total");
+            expect(response.body).toHaveProperty("data");
         });
     });
 });

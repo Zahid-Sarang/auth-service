@@ -79,6 +79,11 @@ describe("GET /users", () => {
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send();
 
+            expect(response.body).toHaveProperty("currentPage");
+            expect(response.body).toHaveProperty("perPage");
+            expect(response.body).toHaveProperty("total");
+            expect(response.body).toHaveProperty("data");
+
             const keys = Object.keys(response.body as Record<string, string>);
 
             const userArray = keys.map(
