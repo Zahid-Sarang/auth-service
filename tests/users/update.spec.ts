@@ -5,6 +5,7 @@ import app from "../../src/app";
 import createJWKSMock from "mock-jwks";
 import { Roles } from "../../src/constants";
 import { User } from "../../src/entity/User";
+import { Tenant } from "../../src/entity/Tenant";
 
 describe("PATCH /users/:id", () => {
     let connection: DataSource;
@@ -43,13 +44,23 @@ describe("PATCH /users/:id", () => {
                 tenantId: 1,
             };
 
+            // tenant data
+            const tenantData = {
+                name: "Tenant Name",
+                address: "Tenant Address",
+            };
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenants = await tenantRepository.save(tenantData);
+
             const userRepository = connection.getRepository(User);
             const users = await userRepository.save(userData);
 
             const updateData = {
-                firstName: "Sarang",
-                lastName: "Zahid",
-                role: Roles.MANAGER,
+                firstName: "Zahid",
+                lastName: "Sarang",
+                email: "zahid@mern.space",
+                role: Roles.CUSTOMER,
+                tenantId: tenants.id,
             };
             const id = users.id;
 
@@ -57,7 +68,6 @@ describe("PATCH /users/:id", () => {
                 .patch(`/users/${id}`)
                 .set("Cookie", [`accessToken=${adminToken}`])
                 .send(updateData);
-
             expect(response.statusCode).toBe(200);
         });
 
@@ -78,10 +88,20 @@ describe("PATCH /users/:id", () => {
             const userRepository = connection.getRepository(User);
             const users = await userRepository.save(userData);
 
+            // tenant data
+            const tenantData = {
+                name: "Tenant Name",
+                address: "Tenant Address",
+            };
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenants = await tenantRepository.save(tenantData);
+
             const updateData = {
                 firstName: "Sarang",
                 lastName: "Zahid",
                 role: Roles.MANAGER,
+                email: "zahid@mern.space",
+                tenantId: tenants.id,
             };
             const id = users.id;
 
