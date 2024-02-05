@@ -44,6 +44,9 @@ describe("PATCH /users/:id", () => {
                 tenantId: 1,
             };
 
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.save(userData);
+
             // tenant data
             const tenantData = {
                 name: "Tenant Name",
@@ -51,9 +54,6 @@ describe("PATCH /users/:id", () => {
             };
             const tenantRepository = connection.getRepository(Tenant);
             const tenants = await tenantRepository.save(tenantData);
-
-            const userRepository = connection.getRepository(User);
-            const users = await userRepository.save(userData);
 
             const updateData = {
                 firstName: "Zahid",
