@@ -11,10 +11,11 @@ export class TenantController {
     ) {}
     async create(req: CreateTenantRequest, res: Response, next: NextFunction) {
         // Validation
-        const validationError = validationResult(req);
-        if (!validationError.isEmpty()) {
-            return res.status(400).json({ errors: validationError.array() });
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
+
         const { name, address } = req.body;
         this.logger.debug("Request for creating a new tenant", req.body);
         try {
@@ -66,9 +67,9 @@ export class TenantController {
 
     async update(req: CreateTenantRequest, res: Response, next: NextFunction) {
         // validation
-        const validationError = validationResult(req);
-        if (!validationError.isEmpty()) {
-            return res.status(400).json({ error: validationError.array() });
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
 
         const { name, address } = req.body;
