@@ -1,6 +1,8 @@
 import { DataSource, Repository } from "typeorm";
 import { Tenant } from "../../src/entity/Tenant";
 
+export const JWKS_MOCK_URL = "http://localhost:5501";
+
 export const truncateTable = async (connection: DataSource) => {
     const entities = connection.entityMetadatas;
     for (const entity of entities) {
