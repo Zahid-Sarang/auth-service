@@ -10,9 +10,12 @@ import { Config } from "./config";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 
 const app = express();
+
+const ALLOWED_DOMAINS = [Config.ADMIN_URL!, Config.CLIENT_URL!];
+
 app.use(
     cors({
-        origin: [Config.CLIENT_URL!],
+        origin: ALLOWED_DOMAINS,
         credentials: true,
     }),
 );
