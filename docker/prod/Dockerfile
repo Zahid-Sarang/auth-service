@@ -1,29 +1,41 @@
-FROM node:18-alpine as builder
+# synatax=docker/dockerfile:1
 
-WORKDIR /app
+ARG NODE_VERSION=21.7.1
+
+FROM node:${NODE_VERSION}-alpine as builder
+
+WORKDIR /home/node/app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY . .
 
 RUN npm run build
 
 
-FROM node:18-alpine as production
+FROM node:${NODE_VERSION}-alpine as runner
+
+USER node
+
+RUN mkdir -p /home/node/app
+
+WORKDIR /home/node/app
 
 ENV NODE_ENV=production
 
-WORKDIR /app
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev --ignore-scripts
 
-COPY package*.json ./
+COPY --from=builder --chown=node:node /home/node/app/dist ./
 
-RUN npm ci --ignore-scripts
-
-COPY --from=builder /app/dist ./
-
-EXPOSE 5500
+EXPOSE 5501
 
 CMD ["node", "src/server.js"]
 
