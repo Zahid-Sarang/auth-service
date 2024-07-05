@@ -79,7 +79,8 @@ public/
 .env.test.local
 .env.production.local
 .env.local
-.env.prod
+.env.production
+.env.migration
 .env.dev
 .env.test
 
