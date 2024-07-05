@@ -8,6 +8,7 @@ import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
 import { CredentialService } from "../services/CredentialService";
 import { Roles } from "../constants";
+import { Config } from "../config";
 
 export class AuthController {
     constructor(
@@ -22,14 +23,14 @@ export class AuthController {
         refreshToken: string,
     ) {
         res.cookie("accessToken", accessToken, {
-            domain: "localhost",
+            domain: Config.MAIN_DOMAIN,
             sameSite: "strict",
             maxAge: 1000 * 60 * 60, // 60 minutes
             httpOnly: true,
         });
 
         res.cookie("refreshToken", refreshToken, {
-            domain: "localhost",
+            domain: Config.MAIN_DOMAIN,
             sameSite: "strict",
             maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
             httpOnly: true,
@@ -156,19 +157,7 @@ export class AuthController {
                 id: String(newRefreshToken.id),
             });
 
-            res.cookie("accessToken", accessToken, {
-                domain: "localhost",
-                sameSite: "strict",
-                maxAge: 1000 * 60 * 60,
-                httpOnly: true,
-            });
-
-            res.cookie("refreshToken", refreshToken, {
-                domain: "localhost",
-                sameSite: "strict",
-                maxAge: 1000 * 60 * 60 * 24 * 365,
-                httpOnly: true,
-            });
+            this.setCookies(res, accessToken, refreshToken);
 
             this.logger.info("User hasb been logged in successfully", {
                 id: user.id,
